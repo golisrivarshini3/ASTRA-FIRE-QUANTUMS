@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: astra-fire-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: astrafire
+      POSTGRES_USER: astra
+      POSTGRES_PASSWORD: astra_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - astra_pgdata:/var/lib/postgresql/data
+volumes:
+  astra_pgdata:
