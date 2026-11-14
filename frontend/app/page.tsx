@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Activity, Atom, BookOpen, BrainCircuit, Database, Flame, Gauge, Image as ImageIcon, Search, ShieldCheck, Upload, ChevronRight, ExternalLink, Orbit, Radio, Shield, Rocket, Target, RefreshCw } from "lucide-react";
+import { Activity, Atom, BookOpen, BrainCircuit, Database, Flame, Gauge, Image as ImageIcon, Search, ShieldCheck, Upload, ChevronRight, ExternalLink, Orbit, Radio, Shield, Rocket, Target, RefreshCw, type LucideIcon } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { getJSON, postJSON, postFile } from "@/lib/api";
 
@@ -16,6 +16,12 @@ const nav = [
   ["Atmosphere Lab","atmosphere",Gauge],["Computer Vision","cv",ImageIcon],["Research Assistant","assistant",BookOpen]
 ] as const;
 const topics = ["Material flammability","Smoke detection","Flame suppression","Gaseous-fuel combustion","Liquid-fuel droplets"];
+const workflowSteps: { n: string; title: string; desc: string; target: string; Icon: LucideIcon }[] = [
+  { n: "01", title: "Discover", desc: "Find NASA investigations by material, fuel, hardware, environment and safety objective.", target: "explorer", Icon: Database },
+  { n: "02", title: "Compare & prioritize", desc: "Rank evidence against a spacecraft, habitat or rover mission context.", target: "ranking", Icon: BrainCircuit },
+  { n: "03", title: "Interpret carefully", desc: "Review atmosphere conditions, flame imagery and source-backed research gaps.", target: "assistant", Icon: BookOpen },
+];
+
 const missionScenarios = [
   { id:"spacecraft", title:"Crewed spacecraft", subtitle:"Cabin & station fire response", icon:Orbit, detail:"Prioritize material ignition, early smoke detection and suppression evidence in enclosed crew environments.", focus:["Material flammability","Smoke detection","Flame suppression"], pillar:"Prevention · Detection · Suppression", caveat:"Microgravity investigations are most directly relevant; verify cabin pressure, oxygen and airflow conditions." },
   { id:"lunar", title:"Lunar habitat", subtitle:"Surface base / pressurized module", icon:Rocket, detail:"Find material and combustion studies that can inform habitat design while making the partial-gravity evidence gap explicit.", focus:["Material flammability","Gaseous-fuel combustion","Flame suppression"], pillar:"Prevention · Suppression", caveat:"Do not treat microgravity as lunar gravity. Current catalog does not identify direct lunar partial-gravity measurements." },
@@ -118,11 +124,7 @@ export default function Home() {
             <div className="panel p-5"><div className="eyebrow">Research landscape</div><h2 className="mt-1 text-lg font-semibold">Coverage across research themes</h2><div className="mt-4 h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={Object.entries(overview?.domains??{}).map(([name,count])=>({name,count}))} margin={{left:-20,bottom:35}}><CartesianGrid stroke="#20334b" vertical={false}/><XAxis dataKey="name" tick={{fill:"#91a5bb",fontSize:10}} angle={-20} textAnchor="end" interval={0}/><YAxis tick={{fill:"#91a5bb",fontSize:10}}/><Tooltip contentStyle={{background:"#101d30",border:"1px solid #20334b",borderRadius:10}}/><Bar dataKey="count" fill="#50d7e8" radius={[5,5,0,0]}/></BarChart></ResponsiveContainer></div></div>
             <div className="panel p-5"><div className="eyebrow">Three safety pillars</div><h2 className="mt-1 text-lg font-semibold">What each pillar needs to answer</h2><div className="mt-5 space-y-4">{[["01","Prevention","Which materials ignite or sustain burning under mission atmospheres?"],["02","Detection","Can smoke and aerosols be detected early in reduced gravity?"],["03","Suppression","Which suppression mechanisms work in altered gravity and airflow?"]].map(([n,t,d])=><div key={n} className="flex gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan/10 text-xs font-bold text-cyan">{n}</div><div><div className="font-semibold">{t}</div><div className="mt-1 text-xs leading-5 text-muted">{d}</div></div></div>)}</div></div>
           </div>
-          <section className="panel p-5"><div className="eyebrow">How ASTRA-FIRE supports the challenge</div><div className="mt-3 grid gap-3 md:grid-cols-3">{[
-            ["01","Discover","Find NASA investigations by material, fuel, hardware, environment and safety objective.","explorer",Database],
-            ["02","Compare & prioritize","Rank evidence against a spacecraft, habitat or rover mission context.","ranking",BrainCircuit],
-            ["03","Interpret carefully","Review atmosphere conditions, flame imagery and source-backed research gaps.","assistant",BookOpen]
-          ].map(([n,title,desc,target,Icon])=>{const I=Icon as typeof Database;return <button key={String(n)} onClick={()=>setTab(String(target))} className="workflow-step text-left"><div className="flex items-center justify-between"><span className="eyebrow">{n}</span><I size={17} className="text-cyan"/></div><div className="mt-2 font-semibold">{String(title)}</div><p className="mt-1 text-xs leading-5 text-muted">{String(desc)}</p><span className="mt-3 inline-flex items-center gap-1 text-xs text-cyan">Open module <ChevronRight size={12}/></span></button>})}</div></section>
+          <section className="panel p-5"><div className="eyebrow">How ASTRA-FIRE supports the challenge</div><div className="mt-3 grid gap-3 md:grid-cols-3">{workflowSteps.map(({ n, title, desc, target, Icon }) => <button key={n} onClick={() => setTab(target)} className="workflow-step text-left"><div className="flex items-center justify-between"><span className="eyebrow">{n}</span><Icon size={17} className="text-cyan"/></div><div className="mt-2 font-semibold">{title}</div><p className="mt-1 text-xs leading-5 text-muted">{desc}</p><span className="mt-3 inline-flex items-center gap-1 text-xs text-cyan">Open module <ChevronRight size={12}/></span></button>)}</div></section>
           <div className="panel p-5"><div className="flex items-center justify-between"><div><div className="eyebrow">Featured records</div><h2 className="mt-1 text-lg font-semibold">Explore the research catalog</h2></div><button className="btn" onClick={()=>setTab("explorer")}>View all</button></div><div className="mt-4 grid gap-3 md:grid-cols-3">{records.slice(0,3).map(r=><RecordCard key={r.id} r={r}/>)}</div></div>
         </div>}
 
